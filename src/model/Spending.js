@@ -6,4 +6,4 @@ const Spending =  new Schema({
     value: {type: Number},
     date: {type: Number},
 })
-module.exports = mongoose.model('spending', Spending)
+module.exports = mongoose.model('spendings', Spending)
