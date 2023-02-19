@@ -15,19 +15,22 @@ router.get("/all", (req, res) => {
 // {
 //     timestamp: 1676729511000
 // }
-router.get("/month", async (req, res) => {
+router.post("/month", async (req, res) => {
+    console.log('tien', req.body)
     if(!req.body.timestamp){
         return error(res, 'Month is missing')
     }
     const budgets = await Budget.find({})
     const timestampReq = parseFloat(req.body.timestamp)
     const monthReq = new Date(timestampReq).getMonth() + 1
-    const yearReq = new Date(timestampReq).getFullYear() + 1
+    const yearReq = new Date(timestampReq).getFullYear()
     let flag = false
     let result = null
+    console.log(monthReq)
+    console.log(yearReq)
     budgets.forEach((item, index) => {
         let month = new Date(item.timestamp).getMonth() + 1
-        let year = new Date(item.timestamp).getFullYear() + 1
+        let year = new Date(item.timestamp).getFullYear()
         if(month === monthReq && year === yearReq ){
             result = item
             flag = !flag

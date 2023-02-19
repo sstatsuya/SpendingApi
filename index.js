@@ -8,7 +8,7 @@ const database = require('./src/config/database')
 database.connect()
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cors({origin: true, credentials: true}));
+app.use(cors());
 // app.use(BodyParser.urlencoded({ extended: true }));
 app.use("/", require("./src/route"));
 
