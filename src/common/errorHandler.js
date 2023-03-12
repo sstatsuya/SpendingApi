@@ -5,6 +5,13 @@ const error=(res, err) =>{
     })
 }
 
+const success=(res, msg) => {
+    return res.json({
+        isError: false,
+        msg: msg
+    })
+}
+
 module.exports = {
-    error
+    error, success
 }

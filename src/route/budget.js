@@ -1,14 +1,16 @@
-const express = require("express"); 
+const express = require("express");
 const { error } = require("../common/errorHandler");
 const router = express.Router()
 const Budget = require('../model/Budget') // import file model ở trên vào
-router.get('/', (req, res)=>{
+const { timeStampToText } = require("../common/helper");
+
+router.get('/', (req, res) => {
     res.send("dday la trang budget")
 })
-router.get("/all", (req, res) => {    
+router.get("/all", (req, res) => {
     Budget.find({})
-            .then(data => res.json(data))
-            .catch(err => res.status(500).json({error: 'Error when get Spending'}))
+        .then(data => res.json(data))
+        .catch(err => res.status(500).json({ error: 'Error when get Spending' }))
 });
 
 //Find by month
@@ -16,8 +18,7 @@ router.get("/all", (req, res) => {
 //     timestamp: 1676729511000
 // }
 router.post("/month", async (req, res) => {
-    console.log('tien', req.body)
-    if(!req.body.timestamp){
+    if (!req.body.timestamp) {
         return error(res, 'Month is missing')
     }
     const budgets = await Budget.find({})
@@ -26,42 +27,47 @@ router.post("/month", async (req, res) => {
     const yearReq = new Date(timestampReq).getFullYear()
     let flag = false
     let result = null
-    console.log(monthReq)
-    console.log(yearReq)
     budgets.forEach((item, index) => {
         let month = new Date(item.timestamp).getMonth() + 1
         let year = new Date(item.timestamp).getFullYear()
-        if(month === monthReq && year === yearReq ){
+        if (month === monthReq && year === yearReq) {
             result = item
             flag = !flag
-            return            
+            return
         }
     })
-    if(flag)return res.json(result)
+    if (flag) return res.json(result)
     return error(res, 'This time is not existed')
 });
 
-router.post('/add', async (req,res) => {
+// Add new budget
+// {
+//     timestamp: 
+//     budget:
+//     used:
+// }
+router.post('/add', async (req, res) => {
     const budgets = await Budget.find({})
+    // console.log(req.body.timestamp)
     const timestampReq = parseFloat(req.body.timestamp)
     const monthReq = new Date(timestampReq).getMonth() + 1
     let existed = false
     budgets.forEach((item, index) => {
         let month = new Date(item.timestamp).getMonth() + 1
-        if(month === monthReq){
+        if (month === monthReq) {
             existed = true
             return
         }
     })
-    if(existed){
+    if (existed) {
         return res.json({
             error: true,
             message: "This month have existed"
         })
     }
-    else{
+    else {
         const newBudget = new Budget({
-            label: 'Tháng '+monthReq,
+            label: timeStampToText('month', timestampReq),
             timestamp: req.body.timestamp,
             budget: req.body.budget,
             used: req.body.used
@@ -71,16 +77,16 @@ router.post('/add', async (req,res) => {
     }
 })
 
-router.delete('/delete', async (req, res ) => {
-    const {id} = req.body
-    try{
-        await Budget.deleteOne({_id: id})
+router.delete('/delete', async (req, res) => {
+    const { id } = req.body
+    try {
+        await Budget.deleteOne({ _id: id })
         return res.json({
             isError: false,
             msg: 'Remove successful'
         })
     }
-    catch(err){
+    catch (err) {
         return error(res, err)
     }
 })
