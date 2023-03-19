@@ -17,8 +17,9 @@ router.get("/all", (req, res) => {
 //     "timestamp": 1678517300000
 // }
 router.post("/month", async (req, res) => {
+    console.log('tien nhan timestamp ', req.body.timestamp)
     if (!req.body.timestamp) {
-        return error(res, 'Month is missing')
+        return error(res, 'Timestamp is missing')
     }
     const spendings = await Spending.find({})
     const timestampReq = parseFloat(req.body.timestamp)
@@ -97,6 +98,35 @@ router.delete('/delete', async (req, res ) => {
         res.json({
             isError: false,
             msg: 'Remove successful'
+        })
+    }
+    catch(err){
+        error(res, err)
+    }
+})
+
+router.patch('/update', async (req, res ) => {
+    try{
+        const {_id} = req.body
+    const oldSpending = await Spending.findById(_id)
+    if(!oldSpending) throw (res, 'This spending is not existed')
+    const data = {
+        name: req.body.name,
+        money: req.body.money,
+        timestamp: req.body.timestamp,
+    }
+    const oldSpendingMonth = new Date(oldSpending.timestamp).getMonth() + 1
+    const oldSpendingYear = new Date(oldSpending.timestamp).getFullYear()
+    const newSpendingMonth = new Date(data.timestamp).getMonth() + 1
+    const newSpendingYear = new Date(data.timestamp).getFullYear()
+    console.log(oldSpendingMonth + " - " + newSpendingMonth+ "-"+ data.timestamp)
+    console.log(oldSpendingYear + " - " + newSpendingYear)
+    if(oldSpendingMonth !== newSpendingMonth)throw(res, 'You cannot change month of spending')
+    if(oldSpendingYear !== newSpendingYear)throw(res, 'You cannot change year of spending')
+        await Spending.findByIdAndUpdate(_id, data, {new: true})
+        res.json({
+            isError: false,
+            msg: 'Update successful'
         })
     }
     catch(err){

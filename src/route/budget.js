@@ -61,8 +61,8 @@ router.post('/add', async (req, res) => {
     })
     if (existed) {
         return res.json({
-            error: true,
-            message: "This month have existed"
+            isError: true,
+            msg: "This month have existed"
         })
     }
     else {
