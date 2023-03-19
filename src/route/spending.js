@@ -107,7 +107,7 @@ router.delete('/delete', async (req, res ) => {
 
 router.patch('/update', async (req, res ) => {
     try{
-        const {_id} = req.body
+    const {_id} = req.body
     const oldSpending = await Spending.findById(_id)
     if(!oldSpending) throw (res, 'This spending is not existed')
     const data = {
@@ -119,8 +119,19 @@ router.patch('/update', async (req, res ) => {
     const oldSpendingYear = new Date(oldSpending.timestamp).getFullYear()
     const newSpendingMonth = new Date(data.timestamp).getMonth() + 1
     const newSpendingYear = new Date(data.timestamp).getFullYear()
-    console.log(oldSpendingMonth + " - " + newSpendingMonth+ "-"+ data.timestamp)
-    console.log(oldSpendingYear + " - " + newSpendingYear)
+    
+    const budgets = await Budget.find({})
+    const differenceValue = parseFloat(data.value) - oldSpending.value
+    budgets.forEach(async (item, index) => {
+        let itemMonth = new Date(item.timestamp).getMonth() + 1;
+        let itemYear = new Date(item.timestamp).getFullYear();
+        if(itemMonth === oldSpendingMonth && itemYear === oldSpendingYear){
+            console.log('phat hien', item._id, itemMonth)
+            await Budget.findByIdAndUpdate(item._id, {used: item.used + differenceValue})
+            return;
+        }
+    })
+
     if(oldSpendingMonth !== newSpendingMonth)throw(res, 'You cannot change month of spending')
     if(oldSpendingYear !== newSpendingYear)throw(res, 'You cannot change year of spending')
         await Spending.findByIdAndUpdate(_id, data, {new: true})
