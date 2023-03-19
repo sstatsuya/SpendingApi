@@ -112,7 +112,7 @@ router.patch('/update', async (req, res ) => {
     if(!oldSpending) throw (res, 'This spending is not existed')
     const data = {
         name: req.body.name,
-        money: req.body.money,
+        value: req.body.money,
         timestamp: req.body.timestamp,
     }
     const oldSpendingMonth = new Date(oldSpending.timestamp).getMonth() + 1
