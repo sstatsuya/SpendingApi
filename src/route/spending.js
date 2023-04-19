@@ -105,7 +105,7 @@ router.delete('/delete', async (req, res ) => {
     }
 })
 
-router.post('/update', async (req, res ) => {
+router.patch('/update', async (req, res ) => {
     try{
     const {_id} = req.body
     const oldSpending = await Spending.findById(_id)
